@@ -45,4 +45,10 @@ Chart Application Version: 1.16.0
 Kube Version: v1.29.4-eks-036c24b
 ```
 
+Run this command to verify that there are Crossplane pods running in their namespace:
+
+```shell
+kubectl get pods -n crossplane-system
+```
+
 That's it, _Crossplane_ is installed. Thing is, much like Terraform it won't do very much for us without _Providers_, which we'll look at in the next step.

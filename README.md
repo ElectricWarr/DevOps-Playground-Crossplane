@@ -21,7 +21,7 @@ In Wetty, enter the `workdir` directory and run the following to set up a connec
 ./eks-config.sh
 ```
 
-(This only contains one simple command if you're curious, but "connecting to kubernetes" is not the focus of our attention today!)
+(This only contains afew simple commands if you're curious, but "connecting to kubernetes" and "creating secrets" are not the focus of our attention today!)
 
 ## DIY
 
@@ -38,3 +38,7 @@ x
     - [Claiming an RDS Database](2-application-developer/2b-rds/README)
     - [Troubleshooting](2-application-developer/2c-troubleshooting/README)
     - [Teardown](2-application-developer/2d-teardown/README)
+
+## Tips
+
+Open this file in VSCode, hit `Ctrl + Shift + V` for "markdown preview", and navigate through the tutorial from there 😁
