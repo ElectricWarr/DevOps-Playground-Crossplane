@@ -11,9 +11,4 @@ spec:
   claimNames:
     kind: PostgreSQLInstance
     plural: postgresqlinstances
-  connectionSecretKeys:
-    - username
-    - password
-    - endpoint
-    - host
   versions: []

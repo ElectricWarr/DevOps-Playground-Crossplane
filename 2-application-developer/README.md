@@ -4,15 +4,10 @@
 
 Request an S3 bucket and a PostgreSQL instance using the published compositions.
 
-## Overview
-
-- Create an instance of the S3 bucket composite resource
-- Create an instance of the PostgreSQL RDS composite resource
-- Investigate and troubleshoot any issues
-
 ## Contents
 
-- [Claiming an S3 Bucket](2-application-developer/2a-s3/README.md)
-- [Claiming an RDS Database](2-application-developer/2b-rds/README.md)
-- [Troubleshooting](2-application-developer/2c-troubleshooting/README.md)
-- [Teardown](2-application-developer/2d-teardown/README.md)
+- [Claiming Resources](2-application-developer/2a-claims/README.md)
+- [Troubleshooting](2-application-developer/2b-troubleshooting/README.md)
+- [Teardown](2-application-developer/2c-teardown/README.md)
+
+Top-Level: [DevOps Playground: Crossplane](../README.md)

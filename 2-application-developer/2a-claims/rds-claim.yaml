@@ -1,8 +1,0 @@
----
-apiVersion: panda.io/v1alpha1
-kind: PostgreSQLInstance
-metadata:
-  name: funny-panda
-spec:
-  parameters:
-    storage: 20

@@ -10,12 +10,8 @@ spec:
   patchSets:
   - name: common
     patches:
-    - fromFieldPath: spec.region
+    - fromFieldPath: spec.parameters.region
       toFieldPath: spec.forProvider.region
-      transforms:
-      - type: string
-        string:
-          fmt: "eu-west-2"
   resources:
   - name: s3Bucket
     base:
@@ -31,7 +27,7 @@ spec:
       patchSetName: common
     - fromFieldPath: "metadata.labels['crossplane.io/claim-namespace']"
       toFieldPath: "spec.writeConnectionSecretToRef.namespace"
-    - fromFieldPath: "spec.pandaName"
+    - fromFieldPath: "spec.parameters.pandaName"
       toFieldPath: "spec.writeConnectionSecretToRef.name"
       transforms:
       - type: string

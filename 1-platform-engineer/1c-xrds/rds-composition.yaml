@@ -17,8 +17,6 @@ spec:
         providerConfigRef:
           name: aws
         forProvider:
-          region: eu-west-2
-          instanceClass: t3.micro
           username: adminuser
           engine: postgres
           engineVersion: "12"
@@ -29,12 +27,14 @@ spec:
             namespace: crossplane-system
             key: password
     patches:
+    - fromFieldPath: "spec.parameters.instanceSize"
+      toFieldPath: "spec.forProvider.instanceClass"
     - fromFieldPath: "metadata.labels['crossplane.io/claim-namespace']"
       toFieldPath: "spec.writeConnectionSecretToRef.namespace"
     - type: CombineFromComposite
       combine:
         variables:
-        - fromFieldPath: "spec.pandaName"
+        - fromFieldPath: "spec.parameters.pandaName"
         - fromFieldPath: "metadata.uid"
         strategy: string
         string:
@@ -43,19 +43,19 @@ spec:
     - type: CombineFromComposite
       combine:
         variables:
-        - fromFieldPath: "spec.pandaName"
+        - fromFieldPath: "spec.parameters.pandaName"
         - fromFieldPath: "metadata.uid"
         strategy: string
         string:
           fmt: "postgres-password-%s-%s"
       toFieldPath: "spec.forProvider.passwordSecretRef.name"
-    - fromFieldPath: "spec.pandaName"
+    - fromFieldPath: "spec.parameters.pandaName"
       toFieldPath: "spec.forProvider.identifierPrefix"
       transforms:
       - type: string
         string:
           fmt: "%s-"
-    - fromFieldPath: "spec.storage"
+    - fromFieldPath: "spec.parameters.storage"
       toFieldPath: "spec.forProvider.allocatedStorage"
     connectionDetails:
     - fromFieldPath: "status.atProvider.endpoint"

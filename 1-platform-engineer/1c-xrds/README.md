@@ -16,19 +16,19 @@ Let's start with RDS - open the file `rds-xrd.yaml` and we'll go through some of
 
 ```yaml
 ---
-  apiVersion: apiextensions.crossplane.io/v1
-  kind: CompositeResourceDefinition
-  metadata:
-    name: xpostgresqlinstances.panda.io
-  spec:
-    group: panda.io
-    names:
-      kind: XPostgreSQLInstance
-      plural: xpostgresqlinstances
-    claimNames:
-      kind: PostgreSQLInstance
-      plural: postgresqlinstances
-    versions: []
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xpostgresqlinstances.panda.io
+spec:
+  group: panda.io
+  names:
+    kind: XPostgreSQLInstance
+    plural: xpostgresqlinstances
+  claimNames:
+    kind: PostgreSQLInstance
+    plural: postgresqlinstances
+  versions: []
 ```
 
 - `spec.group` sets the name of your new API
@@ -54,17 +54,29 @@ versions:
             The specification for how this PostgreSQLInstance should be
             deployed.
           properties:
-            pandaName:
-              type: string
+            parameters:
+              type: object
               description: |
-                The panda name given to you on the Playground Labs website.
-            storage:
-              type: integer
-              description: |
-                The storage size for this PostgreSQLInstance in GB.
+                Parameters for configuring this PostgreSQLInstance's Composite Resource(s).
+              properties:
+                pandaName:
+                  type: string
+                  description: |
+                    The panda name given to you on the Playground Labs website.
+                instanceSize:
+                  type: string
+                  description: |
+                    Instance size (AKA "Instance Class") for this RDS instance.
+                storage:
+                  type: integer
+                  description: |
+                    The storage size for this PostgreSQLInstance in GB.
+              required:
+              - pandaName
+              - instanceSize
+              - storage
           required:
-          - storage
-          - pandaName
+            - parameters
 ```
 
 This section contains definitions for two parameters that our developers will need to provide later, and which we will depend on in our Composition to build out unique resources.
@@ -101,55 +113,58 @@ This section contains definitions for two parameters that our developers will ne
                 The specification for how this PostgreSQLInstance should be
                 deployed.
               properties:
-                pandaName:
-                  type: string
+                parameters:
+                  type: object
                   description: |
-                    The panda name given to you on the Playground Labs website.
-                storage:
-                  type: integer
-                  description: |
-                    The storage size for this PostgreSQLInstance in GB.
+                    Parameters for configuring this PostgreSQLInstance's Composite Resource(s).
+                  properties:
+                    pandaName:
+                      type: string
+                      description: |
+                        The panda name given to you on the Playground Labs website.
+                    instanceSize:
+                      type: string
+                      description: |
+                        Instance size (AKA "Instance Class") for this RDS instance.
+                    storage:
+                      type: integer
+                      description: |
+                        The storage size for this PostgreSQLInstance in GB.
+                  required:
+                  - pandaName
+                  - instanceSize
+                  - storage
               required:
-              - storage
-              - pandaName
+                - parameters
   ```
 
   </details>
 
-Deploy the RDS XRD using `kubectl apply -f rds-xrd.yaml`. After a moment we can verify what we deployed using `kubectl explain`:
+Deploy the RDS XRD using `kubectl apply -f rds-xrd.yaml`. After a moment we can take a look at the potential structure of a Claim using `kubectl explain`, limiting the output down to just `spec.parameters`:
 
 ```text
-[playground@playground 1c-xrds]$ kubectl explain XPostgreSQLInstance
+[playground@playground 1c-xrds]$ kubectl explain PostgreSQLInstance.spec.parameters
 GROUP:      panda.io
-KIND:       XPostgreSQLInstance
+KIND:       PostgreSQLInstance
 VERSION:    v1alpha1
 
+FIELD: parameters <Object>
+
 DESCRIPTION:
-    <empty>
+    Parameters for configuring this PostgreSQLInstance's Composite Resource(s).
+
+
 FIELDS:
-  apiVersion    <string>
-    APIVersion defines the versioned schema of this representation of an object.
-    Servers should convert recognized schemas to the latest internal value, and
-    may reject unrecognized values. More info:
-    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-
-  kind  <string>
-    Kind is a string value representing the REST resource this object
-    represents. Servers may infer this from the endpoint the client submits
-    requests to. Cannot be updated. In CamelCase. More info:
-    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-
-  metadata      <ObjectMeta>
-    Standard object's metadata. More info:
-    https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-
-  spec  <Object> -required-
-    The specification for how this PostgreSQLInstance should be
-    deployed.
+  instanceSize  <string> -required-
+    Instance size (AKA "Instance Class") for this RDS instance.
 
 
-  status        <Object>
-    <no description>
+  pandaName     <string> -required-
+    The panda name given to you on the Playground Labs website.
+
+
+  storage       <integer> -required-
+    The storage size for this PostgreSQLInstance in GB.
 ```
 
 ## Compositions
@@ -183,8 +198,6 @@ Compositions are generally a little more verbose than XRDs, so you can copy-past
           providerConfigRef:
             name: aws
           forProvider:
-            region: eu-west-2
-            instanceClass: t3.micro
             username: adminuser
             engine: postgres
             engineVersion: "12"
@@ -195,12 +208,14 @@ Compositions are generally a little more verbose than XRDs, so you can copy-past
               namespace: crossplane-system
               key: password
       patches:
+      - fromFieldPath: "spec.parameters.instanceSize"
+        toFieldPath: "spec.forProvider.instanceClass"
       - fromFieldPath: "metadata.labels['crossplane.io/claim-namespace']"
         toFieldPath: "spec.writeConnectionSecretToRef.namespace"
       - type: CombineFromComposite
         combine:
           variables:
-          - fromFieldPath: "spec.pandaName"
+          - fromFieldPath: "spec.parameters.pandaName"
           - fromFieldPath: "metadata.uid"
           strategy: string
           string:
@@ -209,19 +224,19 @@ Compositions are generally a little more verbose than XRDs, so you can copy-past
       - type: CombineFromComposite
         combine:
           variables:
-          - fromFieldPath: "spec.pandaName"
+          - fromFieldPath: "spec.parameters.pandaName"
           - fromFieldPath: "metadata.uid"
           strategy: string
           string:
             fmt: "postgres-password-%s-%s"
         toFieldPath: "spec.forProvider.passwordSecretRef.name"
-      - fromFieldPath: "spec.pandaName"
+      - fromFieldPath: "spec.parameters.pandaName"
         toFieldPath: "spec.forProvider.identifierPrefix"
         transforms:
         - type: string
           string:
             fmt: "%s-"
-      - fromFieldPath: "spec.storage"
+      - fromFieldPath: "spec.parameters.storage"
         toFieldPath: "spec.forProvider.allocatedStorage"
       connectionDetails:
       - fromFieldPath: "status.atProvider.endpoint"
@@ -263,12 +278,8 @@ Let's also take a quick look at our composition for S3, provided for you in `s3-
     patchSets:
     - name: common
       patches:
-      - fromFieldPath: spec.region
+      - fromFieldPath: spec.parameters.region
         toFieldPath: spec.forProvider.region
-        transforms:
-        - type: string
-          string:
-            fmt: "eu-west-2"
     resources:
     - name: s3Bucket
       base:
@@ -284,7 +295,7 @@ Let's also take a quick look at our composition for S3, provided for you in `s3-
         patchSetName: common
       - fromFieldPath: "metadata.labels['crossplane.io/claim-namespace']"
         toFieldPath: "spec.writeConnectionSecretToRef.namespace"
-      - fromFieldPath: "spec.pandaName"
+      - fromFieldPath: "spec.parameters.pandaName"
         toFieldPath: "spec.writeConnectionSecretToRef.name"
         transforms:
         - type: string

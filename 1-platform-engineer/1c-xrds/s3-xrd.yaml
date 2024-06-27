@@ -21,29 +21,39 @@ spec:
         properties:
           spec:
             type: object
+            description: |
+              The specification for a PrivateBucket Claim.
             properties:
-              deletionPolicy:
-                description: Defaults to Delete
-                type: string
-                enum:
-                  - Delete
-                  - Orphan
-              pandaName:
-                type: string
-                description: |
-                  The panda name given to you on the Playground Labs website.
-              region:
-                type: string
-              tags:
+              parameters:
                 type: object
-                additionalProperties:
-                  type: string
+                description: |
+                  Parameters for configuring this PrivateBucket's Composite Resource(s).
+                properties:
+                  deletionPolicy:
+                    description: Defaults to Delete
+                    type: string
+                    enum:
+                      - Delete
+                      - Orphan
+                  pandaName:
+                    type: string
+                    description: |
+                      The panda name given to you on the Playground Labs website.
+                  region:
+                    type: string
+                    default: eu-west-2
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                required:
+                  - pandaName
+              status:
+                type: object
+                properties:
+                  bucketName:
+                    type: string
+                  bucketArn:
+                    type: string
             required:
-              - pandaName
-          status:
-            type: object
-            properties:
-              bucketName:
-                type: string
-              bucketArn:
-                type: string
+              - parameters
