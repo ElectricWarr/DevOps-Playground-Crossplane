@@ -62,7 +62,7 @@ kind: PrivateBucket
 metadata:
   name:
 spec:
-  paramaters:
+  parameters:
     pandaName:
 ```
 
