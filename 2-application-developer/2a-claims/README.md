@@ -7,3 +7,5 @@
 Claims are created based on CRDs defined in XRDs
 
 Claims are used to create a namespace-scoped object which causes resources to be created based on a Composition. Parameters specified on Claims are used to template resources in a Composition.
+
+## x
