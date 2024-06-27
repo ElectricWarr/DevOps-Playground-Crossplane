@@ -1,7 +1,11 @@
 # Platform Engineer Role
 
+## Goal
+
+Make S3 and PostgreSQL available to Developers, minimising overhead while maintaining good standards.
+
 ## Contents
 
-- [Crossplane Installation](1-platform-engineer/1a-crossplane-install/README)
-- [Provider Setup](1-platform-engineer/1b-providers/README)
-- [XRDs](1-platform-engineer/1c-xrds/README)
+1. [Install Crossplane](1a-crossplane-install/README)
+2. [Configure Providers for AWS S3, RDS and PostgreSQL](1b-providers/README)
+3. [Create and Publish Composite Resource Definitions](1c-xrds/README)

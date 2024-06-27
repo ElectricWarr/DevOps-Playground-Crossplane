@@ -24,7 +24,7 @@ kubectl apply -f provider-aws.yaml
 
 You should see output like:
 
-```shell
+```text
 [playground@playground crossplane]$ kubectl apply -f provider-aws.yaml
 provider.pkg.crossplane.io/aws-s3 created
 ```
@@ -40,7 +40,7 @@ Notice anything unusual?
 <details>
   <summary>Installed Providers</summary>
 
-  ```shell
+  ```text
   [playground@playground crossplane]$ kubectl get Providers
   NAME                          INSTALLED   HEALTHY   PACKAGE                                              AGE
   aws-s3                        True        True      xpkg.upbound.io/upbound/provider-aws-s3:v1.7.0       42s
@@ -61,7 +61,7 @@ First add three dashes `---` under the manifest for the S3 provider, to create t
 
 Save the file, run `kubectl apply` again, and verify both providers are installed.
 
-```shell
+```text
 [playground@playground crossplane]$ kubectl apply -f provider-aws.yaml
 provider.pkg.crossplane.io/aws-s3 unchanged
 provider.pkg.crossplane.io/aws-rds created
@@ -92,7 +92,7 @@ provider.pkg.crossplane.io/aws-rds created
 
   `kubectl get providers` should output:
 
-  ```shell
+  ```text
   [playground@playground crossplane]$ kubectl get Providers
   NAME                          INSTALLED   HEALTHY   PACKAGE                                              AGE
   aws-rds                       True        True      xpkg.upbound.io/upbound/provider-aws-rds:v1.7.0      21h
@@ -106,7 +106,7 @@ provider.pkg.crossplane.io/aws-rds created
 
 We need to give both of our providers some credentials to use to access AWS. Luckily, they're already available in a secret called `aws-creds` in the default namespace:
 
-```shell
+```text
 [playground@playground crossplane]$ kubectl get secrets aws-creds
 NAME        TYPE     DATA   AGE
 aws-creds   Opaque   1      2d1h
@@ -134,7 +134,7 @@ spec:
 
 Note that we've simply called our ProviderConfig `aws`. Deploy this with `kubectl apply`:
 
-```shell
+```text
 [playground@playground crossplane]$ kubectl apply -f provider-aws-config.yaml
 providerconfig.aws.upbound.io/aws created
 ```
@@ -144,3 +144,5 @@ providerconfig.aws.upbound.io/aws created
 Next step: [Composite Resource Definitions](../1c-xrds/README.md)
 
 Previous step: [Crossplane Install](../1a-crossplane-install/README.md)
+
+Top-Level: [DevOps Playground: Crossplane](../../README.md)

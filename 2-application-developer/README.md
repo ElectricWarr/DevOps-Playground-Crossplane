@@ -1,4 +1,14 @@
-# TITLE
+# Application Developer Role
+
+## Goal
+
+Request an S3 bucket and a PostgreSQL instance using the published compositions.
+
+## Overview
+
+- Create an instance of the S3 bucket composite resource
+- Create an instance of the PostgreSQL RDS composite resource
+- Investigate and troubleshoot any issues
 
 ## Contents
 

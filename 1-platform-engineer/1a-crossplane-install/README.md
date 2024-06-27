@@ -52,3 +52,9 @@ kubectl get pods -n crossplane-system
 ```
 
 That's it, _Crossplane_ is installed. Thing is, much like Terraform it won't do very much for us without _Providers_, which we'll look at in the next step.
+
+## Navigation
+
+Next step: [Providers](../1b-providers/README.md)
+
+Top-Level: [DevOps Playground: Crossplane](../../README.md)

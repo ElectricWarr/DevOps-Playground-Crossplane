@@ -1,0 +1,8 @@
+---
+apiVersion: panda.io/v1alpha1
+kind: PrivateBucket
+metadata:
+  name: funny-panda
+spec:
+    pandaName: funny
+    region: ignored
