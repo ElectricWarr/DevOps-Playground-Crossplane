@@ -114,7 +114,7 @@ aws-creds   Opaque   1      2d1h
 
 This is where that extra provider comes in: we can configure credentials on the parent provider `upbound-provider-family-aws`, and these will be inherited by all the AWS providers we have installed.
 
-Create the following manifest file and name it `provider-aws-config.yaml`:
+Open `provider-aws-config.yaml` and paste in the following manifest:
 
 ```yaml
 ---
