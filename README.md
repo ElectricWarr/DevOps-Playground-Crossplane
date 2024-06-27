@@ -6,7 +6,7 @@ DevOps Playground for Crossplane, first presented 2024-06-27
 
 ## Initial Setup
 
-As long as you are registered for the Meetup event you can request your environment at the [DevOps Playground Lab](lab.devopsplayground.org) site.
+As long as you are registered for the Meetup event you can request your environment at the [DevOps Playground Lab](https://lab.devopsplayground.org) site.
 
 Then, open these links as tabs in a new browser window, replacing `YOUR-PANDA` with what you were given by the Lab website:
 
