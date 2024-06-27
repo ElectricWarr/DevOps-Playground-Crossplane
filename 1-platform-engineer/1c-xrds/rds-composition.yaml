@@ -1,0 +1,68 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xpostgresqlinstances.aws.panda.io
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: panda.io/v1alpha1
+    kind: XPostgreSQLInstance
+  resources:
+  - name: rdsinstance
+    base:
+      apiVersion: rds.aws.upbound.io/v1beta3
+      kind: Instance
+      spec:
+        providerConfigRef:
+          name: aws
+        forProvider:
+          region: eu-west-2
+          instanceClass: t3.micro
+          username: adminuser
+          engine: postgres
+          engineVersion: "12"
+          skipFinalSnapshot: true
+          publiclyAccessible: false
+          autoGeneratePassword: true
+          passwordSecretRef:
+            namespace: crossplane-system
+            key: password
+    patches:
+    - fromFieldPath: "metadata.labels['crossplane.io/claim-namespace']"
+      toFieldPath: "spec.writeConnectionSecretToRef.namespace"
+    - type: CombineFromComposite
+      combine:
+        variables:
+        - fromFieldPath: "spec.pandaName"
+        - fromFieldPath: "metadata.uid"
+        strategy: string
+        string:
+          fmt: "postgres-connection-%s-%s"
+      toFieldPath: "spec.writeConnectionSecretToRef.name"
+    - type: CombineFromComposite
+      combine:
+        variables:
+        - fromFieldPath: "spec.pandaName"
+        - fromFieldPath: "metadata.uid"
+        strategy: string
+        string:
+          fmt: "postgres-password-%s-%s"
+      toFieldPath: "spec.forProvider.passwordSecretRef.name"
+    - fromFieldPath: "spec.pandaName"
+      toFieldPath: "spec.forProvider.identifierPrefix"
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-"
+    - fromFieldPath: "spec.storage"
+      toFieldPath: "spec.forProvider.allocatedStorage"
+    connectionDetails:
+    - fromFieldPath: "status.atProvider.endpoint"
+      name: endpoint
+    - fromFieldPath: "status.atProvider.address"
+      name: host
+    - fromFieldPath: "spec.forProvider.username"
+      name: username
+    - fromConnectionSecretKey: "attribute.password"
+      name: password

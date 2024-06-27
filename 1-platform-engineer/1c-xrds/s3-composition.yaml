@@ -1,0 +1,72 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: privatebucket.aws.panda.io
+spec:
+  compositeTypeRef:
+    apiVersion: panda.io/v1alpha1
+    kind: XPrivateBucket
+  patchSets:
+  - name: common
+    patches:
+    - fromFieldPath: spec.region
+      toFieldPath: spec.forProvider.region
+      transforms:
+      - type: string
+        string:
+          fmt: "eu-west-2"
+  resources:
+  - name: s3Bucket
+    base:
+      apiVersion: s3.aws.upbound.io/v1beta1
+      kind: Bucket
+      spec:
+        providerConfigRef:
+          name: aws
+        forProvider:
+          forceDestroy: true
+    patches:
+    - type: PatchSet
+      patchSetName: common
+    - fromFieldPath: "metadata.labels['crossplane.io/claim-namespace']"
+      toFieldPath: "spec.writeConnectionSecretToRef.namespace"
+    - fromFieldPath: "spec.pandaName"
+      toFieldPath: "spec.writeConnectionSecretToRef.name"
+      transforms:
+      - type: string
+        string:
+          fmt: "s3-connection-%s"
+  - name: s3PublicAccessBlock
+    base:
+      apiVersion: s3.aws.upbound.io/v1beta1
+      kind: BucketPublicAccessBlock
+      spec:
+        providerConfigRef:
+          name: aws
+        forProvider:
+          bucketSelector:
+            matchControllerRef: true
+          blockPublicAcls: true
+          blockPublicPolicy: true
+          ignorePublicAcls: true
+          restrictPublicBuckets: true
+    patches:
+        - type: PatchSet
+          patchSetName: common
+  - name: s3ServerSideEncryption
+    base:
+        apiVersion: s3.aws.upbound.io/v1beta1
+        kind: BucketServerSideEncryptionConfiguration
+        spec:
+          providerConfigRef:
+            name: aws
+          forProvider:
+            bucketSelector:
+              matchControllerRef: true
+            rule:
+              - applyServerSideEncryptionByDefault:
+                  - sseAlgorithm: AES256
+    patches:
+        - type: PatchSet
+          patchSetName: common
